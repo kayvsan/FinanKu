@@ -1,0 +1,99 @@
+/* ─── LOGIN PAGE (not part of index.original.html; reuses its tokens) ─── */
+.login-page {
+  min-height: calc(100vh - 28px); /* viewport minus the ticker bar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+.login-window {
+  width: 100%;
+  max-width: 420px;
+}
+.login-window .window-body { padding: 24px; }
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1.5px solid rgba(27, 27, 58, 0.1);
+}
+.login-brand h1 { font-size: 1.25rem; }
+.login-logo-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--butter);
+  border: var(--border-heavy);
+  border-radius: var(--radius-card);
+  box-shadow: 2px 2px 0 var(--navy);
+  flex-shrink: 0;
+}
+.login-brand-sub {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(27, 27, 58, 0.55);
+}
+
+.login-title { font-size: 1.35rem; margin-top: 10px; }
+.login-sub {
+  font-size: 0.8rem;
+  color: rgba(27, 27, 58, 0.6);
+  margin: 4px 0 16px;
+}
+
+.login-tabs { grid-template-columns: 1fr 1fr; }
+
+/* index.css only styles text/date/number inputs */
+.login-window input[type="password"] {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  border: var(--border-light);
+  border-radius: var(--radius-btn);
+  background: var(--bg-panel);
+  color: var(--navy);
+  outline: none;
+  width: 100%;
+}
+.login-password-wrap { position: relative; }
+.login-password-wrap input { padding-right: 40px !important; }
+.login-eye-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(27, 27, 58, 0.55);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.login-eye-btn:hover { background: var(--bg-page); color: var(--navy); }
+
+.login-submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 10px 14px;
+}
+.login-submit:disabled { opacity: 0.6; cursor: wait; }
+
+.login-note {
+  margin-top: 14px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: rgba(27, 27, 58, 0.5);
+}

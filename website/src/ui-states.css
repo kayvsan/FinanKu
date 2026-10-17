@@ -1,0 +1,82 @@
+/* ─── LOADING / BUSY STATES (not part of index.original.html; reuses its tokens) ─── */
+
+/* Global request indicator above the ticker */
+.net-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+}
+.net-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  background: repeating-linear-gradient(90deg, var(--bubblegum) 0 12px, var(--navy) 12px 24px);
+  animation: net-progress-slide 0.9s linear infinite;
+}
+@keyframes net-progress-slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+
+/* Account menu on the header user pill */
+button.header-user-pill { color: var(--navy); }
+/* Long usernames are truncated in the pill (full name is shown inside the menu) */
+.header-user-name {
+  display: inline-block;
+  vertical-align: bottom;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 768px) {
+  .header-user-name { max-width: 72px; }
+  /* Month picker + bell + account menu need the room on phones; the currency badge is decorative */
+  .header-badge-curr { display: none; }
+  .header-right { flex-wrap: wrap; justify-content: flex-end; }
+}
+.dropdown-user-label {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px 4px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(27, 27, 58, 0.5);
+}
+.dropdown-user-label strong {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  color: var(--navy);
+  word-break: break-all;
+}
+.dropdown-item.danger,
+.dropdown-item.danger svg { color: var(--error); }
+.dropdown-item.danger:hover { background: #fef2f2; }
+
+/* Buttons waiting on the server */
+.btn:disabled,
+.win-badge-btn:disabled,
+.tx-actions button:disabled,
+.dropdown-item:disabled,
+.alert-banner button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  box-shadow: none;
+}
+label.btn.is-busy { opacity: 0.6; cursor: wait; pointer-events: none; }
+
+/* A row/card that is being deleted or updated */
+.is-busy {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
