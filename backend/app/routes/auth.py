@@ -13,6 +13,7 @@ from flask_jwt_extended import (
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from .. import ratelimit
 from ..extensions import db
 from ..models import TokenBlocklist, User
 from ..seed import seed_demo
@@ -34,14 +35,18 @@ def _is_mobile_client():
 def _session_response(user, status=200):
     """Body carries the short-lived access token. The refresh token goes into an httpOnly cookie for the
     web app, or into the body for the mobile app (which keeps it in the device's secure storage)."""
-    body = {'user': user_to_dict(user), 'accessToken': create_access_token(identity=str(user.id))}
-    refresh_token = create_refresh_token(identity=str(user.id))
+    body = {'user': user_to_dict(user), 'accessToken': _access_token(user)}
+    refresh_token = create_refresh_token(identity=str(user.id), additional_claims={'ucr': user.token_stamp()})
     if _is_mobile_client():
         body['refreshToken'] = refresh_token
         return jsonify(body), status
     resp = jsonify(body)
     set_refresh_cookies(resp, refresh_token)
     return resp, status
+
+
+def _access_token(user):
+    return create_access_token(identity=str(user.id), additional_claims={'ucr': user.token_stamp()})
 
 
 def _credentials():
@@ -60,6 +65,7 @@ def register():
         raise ApiError('Nama pengguna 3–40 karakter (huruf, angka, _ . -).')
     if not 6 <= len(password) <= 128:
         raise ApiError('Kata sandi minimal 6 karakter.')
+    ratelimit.check_register_allowed()
     if _username_taken(username):
         raise ApiError(USERNAME_TAKEN, 409)
 
@@ -75,6 +81,7 @@ def register():
         # the unique index rejects the second one
         db.session.rollback()
         raise ApiError(USERNAME_TAKEN, 409)
+    ratelimit.record_register()
     return _session_response(user, 201)
 
 
@@ -85,9 +92,14 @@ def _username_taken(username):
 @bp.post('/login')
 def login():
     username, password = _credentials()
+    # Checked before the password so a locked account can't keep being guessed. Unknown usernames are
+    # counted and locked the same way, so the response never reveals which accounts exist.
+    ratelimit.check_login_allowed(username)
     user = db.session.scalar(db.select(User).filter_by(username_lower=username.lower()))
     if user is None or not check_password_hash(user.password_hash, password):
+        ratelimit.record_login_failure(username)
         raise ApiError(INVALID_LOGIN, 401)
+    ratelimit.record_login_success(username)
     return _session_response(user)
 
 
@@ -98,7 +110,7 @@ def refresh():
     user = db.session.get(User, current_user_id())
     if user is None:
         raise ApiError('Akun tidak ditemukan.', 401)
-    return jsonify(user=user_to_dict(user), accessToken=create_access_token(identity=str(user.id)))
+    return jsonify(user=user_to_dict(user), accessToken=_access_token(user))
 
 
 @bp.post('/logout')

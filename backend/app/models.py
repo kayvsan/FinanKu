@@ -15,6 +15,11 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
 
+    def token_stamp(self):
+        """Identifies this exact account row. Tokens carry it next to the id, so a token issued to a
+        deleted account can't be used by a newer account that reuses the same id (DB reset/restore)."""
+        return self.created_at.replace(tzinfo=None).isoformat(timespec='microseconds')
+
 
 class Wallet(db.Model):
     __tablename__ = 'wallets'
@@ -66,6 +71,14 @@ class Goal(db.Model):
     target = db.Column(db.BigInteger, nullable=False)
     saved = db.Column(db.BigInteger, nullable=False, default=0)
     deadline = db.Column(db.String(10), nullable=True)
+
+
+class AuthAttempt(db.Model):
+    """One failed login or one sign-up, used for rate limiting (see app/ratelimit.py)."""
+    __tablename__ = 'auth_attempts'
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(120), nullable=False, index=True)  # e.g. "login-user:kams", "login-ip:1.2.3.4"
+    created_at = db.Column(db.DateTime, nullable=False, index=True)  # naive UTC
 
 
 class TokenBlocklist(db.Model):

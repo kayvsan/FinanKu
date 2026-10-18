@@ -25,6 +25,15 @@ class Config:
 
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '')
 
+    # Brute-force protection (app/ratelimit.py)
+    LOGIN_MAX_FAILURES_PER_USER = int(os.environ.get('LOGIN_MAX_FAILURES_PER_USER', 5))
+    LOGIN_MAX_FAILURES_PER_IP = int(os.environ.get('LOGIN_MAX_FAILURES_PER_IP', 20))
+    LOGIN_WINDOW_SECONDS = int(os.environ.get('LOGIN_WINDOW_SECONDS', 15 * 60))
+    REGISTER_MAX_PER_IP = int(os.environ.get('REGISTER_MAX_PER_IP', 10))
+    REGISTER_WINDOW_SECONDS = int(os.environ.get('REGISTER_WINDOW_SECONDS', 60 * 60))
+    # Number of reverse proxies in front of Flask (nginx, Caddy, ...) so the real client IP is used
+    TRUSTED_PROXY_COUNT = int(os.environ.get('TRUSTED_PROXY_COUNT', 0))
+
 
 class TestConfig(Config):
     TESTING = True

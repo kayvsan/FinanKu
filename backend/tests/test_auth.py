@@ -76,3 +76,30 @@ def test_concurrent_duplicate_registration_returns_409(api, monkeypatch):
     res = Api(api.client).register('BALAPAN')
     assert res.status_code == 409
     assert res.get_json()['error'] == 'Nama pengguna sudah terdaftar. Silakan masuk.'
+
+
+def test_tokens_of_a_deleted_account_do_not_open_a_new_account_with_the_same_id(app, client):
+    # Account A logs in (web: refresh cookie, mobile: tokens in the body)
+    a = client.post('/api/auth/register', json={'username': 'lama', 'password': 'rahasia123'}, headers={'X-Client': 'mobile'}).get_json()
+    old_access, old_refresh = a['accessToken'], a['refreshToken']
+
+    # The database is reset / restored: A disappears and B gets the same id
+    from app.extensions import db
+    from app.models import User
+    from app.seed import clear_user_data
+    with app.app_context():
+        user = db.session.get(User, int(a['user']['id']))
+        clear_user_data(user.id, keep_categories=False)
+        db.session.delete(user)
+        db.session.commit()
+    b = Api(client.application.test_client())
+    assert b.register('baru').status_code == 201
+    assert b.state() is not None
+    with app.app_context():
+        assert db.session.scalar(db.select(User.id).filter_by(username_lower='baru')) == int(a['user']['id'])
+
+    # A's old tokens must not open B's account
+    res = client.get('/api/state', headers={'Authorization': f'Bearer {old_access}'})
+    assert res.status_code == 401
+    assert res.get_json()['error'] == 'Sesi tidak valid. Silakan login kembali.'
+    assert client.post('/api/auth/refresh', headers={'Authorization': f'Bearer {old_refresh}'}).status_code == 401

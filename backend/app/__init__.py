@@ -7,10 +7,11 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 
 from flask import Flask, jsonify, request  # noqa: E402
 from werkzeug.exceptions import HTTPException  # noqa: E402
+from werkzeug.middleware.proxy_fix import ProxyFix  # noqa: E402
 
 from .config import BACKEND_DIR, Config  # noqa: E402
 from .extensions import db, jwt  # noqa: E402
-from .models import TokenBlocklist  # noqa: E402
+from .models import TokenBlocklist, User  # noqa: E402
 from .utils import ApiError  # noqa: E402
 
 
@@ -20,6 +21,9 @@ def create_app(config_class=Config):
     if not app.config.get('JWT_SECRET_KEY'):
         raise RuntimeError('JWT_SECRET_KEY belum di-set. Salin backend/.env.example ke backend/.env dan isi kuncinya.')
     os.makedirs(app.instance_path, exist_ok=True)
+    if app.config.get('TRUSTED_PROXY_COUNT'):
+        # Use X-Forwarded-For from that many proxies as request.remote_addr (rate limiting is per IP)
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=app.config['TRUSTED_PROXY_COUNT'], x_proto=1)
 
     db.init_app(app)
     jwt.init_app(app)
@@ -57,6 +61,15 @@ def _register_jwt_callbacks():
         jti = jwt_payload['jti']
         return db.session.scalar(db.select(TokenBlocklist.id).filter_by(jti=jti)) is not None
 
+    @jwt.token_verification_loader
+    def token_matches_account(_jwt_header, jwt_payload):
+        # The account must still exist and be the same row the token was issued to (see User.token_stamp)
+        try:
+            user = db.session.get(User, int(jwt_payload['sub']))
+        except (KeyError, TypeError, ValueError):
+            return False
+        return user is not None and jwt_payload.get('ucr') == user.token_stamp()
+
     def unauthorized(message):
         return jsonify(error=message), 401
 
@@ -65,6 +78,7 @@ def _register_jwt_callbacks():
     jwt.expired_token_loader(lambda _h, _p: unauthorized('Sesi kedaluwarsa.'))
     jwt.revoked_token_loader(lambda _h, _p: unauthorized('Sesi sudah berakhir. Silakan login kembali.'))
     jwt.needs_fresh_token_loader(lambda _h, _p: unauthorized('Silakan login kembali.'))
+    jwt.token_verification_failed_loader(lambda _h, _p: unauthorized('Sesi tidak valid. Silakan login kembali.'))
 
 
 def _register_cors(app):
@@ -92,7 +106,7 @@ def _register_error_handlers(app):
     @app.errorhandler(ApiError)
     def handle_api_error(err):
         db.session.rollback()
-        return jsonify(error=err.message), err.status
+        return jsonify(error=err.message), err.status, getattr(err, 'headers', None) or {}
 
     @app.errorhandler(HTTPException)
     def handle_http_error(err):

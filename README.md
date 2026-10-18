@@ -63,6 +63,17 @@ cd ..\website; npm run lint
 - Saat access token kedaluwarsa, frontend otomatis memanggil `/api/auth/refresh` lalu mengulang request.
 - Logout mencabut refresh token (blocklist di database).
 - Kata sandi di-hash dengan Werkzeug (scrypt).
+- Setiap token diikat ke akun yang menerbitkannya (id + waktu pembuatan akun), jadi token akun yang sudah dihapus tidak berlaku untuk akun baru yang kebetulan mendapat id yang sama.
+
+### Pembatasan percobaan (anti brute-force)
+
+| Batas | Default | Respon |
+|---|---|---|
+| Login gagal per akun | 5 kali / 15 menit → akun terkunci sementara (sandi benar pun ditolak) | `429` + header `Retry-After` |
+| Login gagal per IP | 20 kali / 15 menit | `429` |
+| Pendaftaran per IP | 10 akun / jam | `429` |
+
+Login berhasil mereset hitungan akun. Nama pengguna yang tidak terdaftar diperlakukan sama, jadi tidak bisa dipakai untuk menebak akun mana yang ada. Catatan percobaan disimpan di database (tabel `auth_attempts`), jadi tetap berlaku setelah restart. Semua batas bisa diatur lewat `backend/.env` (lihat `.env.example`); di belakang reverse proxy set `TRUSTED_PROXY_COUNT`.
 
 ## Endpoint API (`/api`)
 
