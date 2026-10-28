@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Outlet } from 'react-router';
-import { LayoutDashboard, ArrowLeftRight, Plus, PieChart, TrendingUp } from 'lucide-react';
-import TopTickerBar from './TopTickerBar';
+import { LayoutGrid, ArrowLeftRight, Plus, PieChart, TrendingUp } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { useFinance } from '../context/FinanceContext';
@@ -28,9 +27,15 @@ export default function AppLayout() {
   } = useFinance();
   const searchInputRef = useRef(null);
 
-  // Keyboard shortcuts: 'N' for transaction, '/' for search, Escape closes modals
+  // Keyboard shortcuts: 'N' for transaction, '/' or '⌘K' for search, Escape closes modals
   useEffect(() => {
     const onKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const s = searchInputRef.current;
+        if (s) { s.focus(); s.select(); }
+        return;
+      }
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
       if (e.key === '/') {
         e.preventDefault();
@@ -50,50 +55,61 @@ export default function AppLayout() {
   const walletOnboarding = state.wallets.length === 0;
 
   const mobBtn = (id, label, Icon) => (
-    <button onClick={() => switchPage(id)} data-nav={id} className={`mob-btn nav-btn${currentPage === id ? ' active' : ''}`}>
-      <Icon style={{ width: 20, height: 20 }} /><span>{label}</span>
+    <button
+      type="button"
+      onClick={() => switchPage(id)}
+      data-nav={id}
+      className={`flex flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer ${
+        currentPage === id
+          ? 'bg-[#CCF32F] text-[#11221B] border-2 border-[#11221B]'
+          : 'text-[#11221B]/70'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      <span>{label}</span>
     </button>
   );
 
   return (
-    <>
-      {/* TOP RUNNING MARQUEE TICKER */}
-      <TopTickerBar />
+    <div className="min-h-screen bg-[#F8F7F2] text-[#11221B] flex flex-row relative">
+      {/* MOBILE BACKDROP */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-[#11221B]/40 z-40 md:hidden"
+          id="sidebar-backdrop"
+          onClick={closeMobileSidebar}
+        />
+      )}
 
-      <div className="app-body-layout">
-        {/* MOBILE BACKDROP */}
-        <div className={`sidebar-backdrop${mobileSidebarOpen ? ' show' : ''}`} id="sidebar-backdrop" onClick={closeMobileSidebar}></div>
+      {/* A. Sidebar Kiri Tetap */}
+      <Sidebar searchInputRef={searchInputRef} />
 
-        <Sidebar />
+      {/* B. Area Konten Utama */}
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen pb-24 md:pb-12">
+        <Header />
 
-        <div className="main-wrapper">
-          <Header searchInputRef={searchInputRef} />
-
-          <main className="content-area">
-            <section key={currentPage} id={`view-${currentPage}`} className="page-view visible animate-fade">
-              <Outlet />
-            </section>
-          </main>
-        </div>
+        <main className="flex-1 w-full max-w-[1440px] mx-auto px-5 md:px-10 py-4">
+          <section key={currentPage} id={`view-${currentPage}`} className="page-view visible animate-fade">
+            <Outlet />
+          </section>
+        </main>
       </div>
 
       {/* MOBILE BOTTOM NAV */}
-      <nav className="mobile-nav">
-        {mobBtn('dashboard', 'Beranda', LayoutDashboard)}
-        {mobBtn('transactions', 'Transaksi', ArrowLeftRight)}
-        <button onClick={() => openTransactionModal()} className="mob-fab">
-          <Plus style={{ width: 24, height: 24 }} />
+      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-[#F8F7F2] border-t-2 border-[#11221B] px-2 py-1.5 flex md:hidden items-center justify-around">
+        {mobBtn('dashboard', 'Beranda', LayoutGrid)}
+        {mobBtn('transactions', 'Alur', ArrowLeftRight)}
+        <button
+          type="button"
+          onClick={() => openTransactionModal()}
+          className="w-12 h-12 -mt-6 rounded-2xl bg-[#CCF32F] text-[#11221B] border-2 border-[#11221B] shadow-[3px_3px_0px_0px_#11221B] flex items-center justify-center cursor-pointer"
+          aria-label="Catat Transaksi"
+        >
+          <Plus className="w-6 h-6 stroke-[2.5]" />
         </button>
         {mobBtn('budgets', 'Anggaran', PieChart)}
-        {mobBtn('analytics', 'Analisis', TrendingUp)}
+        {mobBtn('analytics', 'Laporan', TrendingUp)}
       </nav>
-
-      {/* RETRO FAB BUTTON */}
-      <button className="retro-fab" onClick={() => openTransactionModal()} title="Catat Transaksi Cepat (Shortcut: N)">
-        <span className="retro-fab-star">✦</span>
-        <span>CATAT TRANSAKSI</span>
-        <span className="retro-fab-key">N</span>
-      </button>
 
       {/* MODALS */}
       {txModal.open && <TransactionModal />}
@@ -101,6 +117,7 @@ export default function AppLayout() {
       {categoryModal.open && <CategoryModal />}
       {categoryReplace.open && <CategoryReplaceModal />}
       {goalModalOpen && <GoalModal />}
-    </>
+    </div>
   );
 }
+

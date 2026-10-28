@@ -1,128 +1,147 @@
-import { useEffect, useState } from 'react';
-import { Menu, Search, ChevronDown, ChevronLeft, ChevronRight, TrendingUp, Target, Tags, Settings, Bell, User, LogOut } from 'lucide-react';
+import { Menu, ChevronLeft, ChevronRight, Bell, Compass, LayoutGrid, GitBranch } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { useAuth } from '../context/AuthContext';
 import { getMonthLabel } from '../shared/utils/formatters';
+import { getBudgetStatuses, calculateTotalBalance } from '../shared/utils/finance';
+import { formatIDR } from '../shared/utils/formatters';
 
-const PILLS = [
-  { id: 'dashboard', label: 'DASHBOARD' },
-  { id: 'transactions', label: 'TRANSAKSI' },
-  { id: 'wallets', label: 'DOMPET' },
-  { id: 'budgets', label: 'ANGGARAN' }
-];
+export default function Header() {
+  const {
+    currentPage,
+    switchPage,
+    selectedMonth,
+    changeGlobalMonth,
+    toggleSidebar,
+    budgetAlertCount,
+    state,
+    openTransactionModal
+  } = useFinance();
+  const { currentUser } = useAuth();
 
-export default function Header({ searchInputRef }) {
-  const { currentPage, switchPage, selectedMonth, changeGlobalMonth, toggleSidebar, handleGlobalSearch, budgetAlertCount } = useFinance();
-  const { currentUser, logout } = useAuth();
-  const [openMenu, setOpenMenu] = useState(null);
-  const [loggingOut, setLoggingOut] = useState(false);
+  const displayName = currentUser ? currentUser.charAt(0).toUpperCase() + currentUser.slice(1) : 'Galih';
 
-  const handleLogout = () => {
-    setLoggingOut(true);
-    logout();
-  };
+  const budgets = getBudgetStatuses(state, selectedMonth);
+  const safeCount = budgets.filter((b) => b.pct < 80).length;
+  const totalBal = calculateTotalBalance(state);
 
-  useEffect(() => {
-    if (!openMenu) return;
-    const onDocClick = (e) => {
-      if (!e.target.closest('.header-dropdown-wrap')) setOpenMenu(null);
-    };
-    document.addEventListener('click', onDocClick);
-    return () => document.removeEventListener('click', onDocClick);
-  }, [openMenu]);
-
-  const toggleMenu = (name) => setOpenMenu(current => (current === name ? null : name));
-
-  const go = (page) => {
-    setOpenMenu(null);
-    switchPage(page);
-  };
+  const isAlurActive = currentPage === 'transactions' || currentPage === 'analytics';
 
   return (
-    <header className="top-header">
-      <div className="header-left">
-        <button className="header-sidebar-toggle" onClick={toggleSidebar} title="Toggle Sidebar">
-          <Menu />
-        </button>
-        <div className="header-search-wrap">
-          <Search />
-          <input
-            ref={searchInputRef}
-            type="text"
-            id="header-global-search"
-            placeholder="Cari transaksi, dompet, atau #tag..."
-            onInput={(e) => handleGlobalSearch(e.target.value)}
-          />
-          <kbd className="header-kbd">/</kbd>
-        </div>
-      </div>
-
-      <div className="header-right">
-        <div className="header-nav-pills">
-          {PILLS.map(p => (
+    <header className="w-full px-5 md:px-10 pt-6 pb-2 flex flex-col gap-4">
+      {/* Top Row: Greeting Left + Segmented Toggle & Month Controls Right */}
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+        {/* Left: Greeting & Sub-text */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3">
             <button
-              key={p.id}
-              className={`header-pill${currentPage === p.id ? ' active' : ''}`}
-              onClick={() => go(p.id)}
-              data-header-nav={p.id}
+              type="button"
+              onClick={toggleSidebar}
+              className="md:hidden w-10 h-10 rounded-xl border-2 border-[#11221B] bg-white shadow-[2px_2px_0px_0px_#11221B] flex items-center justify-center shrink-0 cursor-pointer"
+              aria-label="Buka menu navigasi"
             >
-              {p.label}
+              <Menu className="w-5 h-5 text-[#11221B]" />
             </button>
-          ))}
-          <div className="header-dropdown-wrap">
-            <button className="header-pill header-dropdown-btn" onClick={() => toggleMenu('more')}>
-              <span>LAINNYA</span> <ChevronDown style={{ width: 13, height: 13 }} />
+
+            <h1 className="text-3xl sm:text-4xl md:text-[42px] font-extrabold tracking-tight text-[#11221B] leading-tight">
+              Halo,{' '}
+              <span className="relative inline-block px-2.5 py-0.5 bg-[#CCF32F] rounded-xl border-2 border-[#11221B] shadow-[3px_3px_0px_0px_#11221B] -rotate-1">
+                {displayName}
+              </span>
+              .
+            </h1>
+          </div>
+
+          <p className="text-sm md:text-base font-medium text-[#11221B]/80 mt-1">
+            {budgets.length > 0
+              ? `${safeCount} dari ${budgets.length} pos anggaran bulan ${getMonthLabel(selectedMonth)} terkendali · Saldo aktif ${formatIDR(totalBal)}.`
+              : `Saldo aktif ${formatIDR(totalBal)} pada periode ${getMonthLabel(selectedMonth)}. Tinggal atur pos anggaran bulananmu.`}
+          </p>
+
+          <div className="flex items-center gap-2 text-xs text-[#11221B]/75 mt-0.5">
+            <Compass className="w-4 h-4 text-[#11221B] shrink-0" />
+            <span>Ingin mulai mencatat hari ini?</span>
+            <button
+              type="button"
+              onClick={() => openTransactionModal('expense')}
+              className="font-bold text-[#11221B] underline underline-offset-4 hover:text-[#0F7A5A] cursor-pointer"
+            >
+              Catat transaksi 30 detik
             </button>
-            <div className={`header-dropdown-menu${openMenu === 'more' ? ' show' : ''}`} id="header-menu-dropdown">
-              <button className="dropdown-item" onClick={() => go('analytics')}><TrendingUp /> Analisis & Tren</button>
-              <button className="dropdown-item" onClick={() => go('goals')}><Target /> Target Tabungan</button>
-              <button className="dropdown-item" onClick={() => go('categories')}><Tags /> Kelola Kategori</button>
-              <div className="dropdown-divider"></div>
-              <button className="dropdown-item" onClick={() => go('settings')}><Settings /> Pengaturan & Cadangan</button>
-            </div>
           </div>
         </div>
 
-        <div className="month-picker">
-          <button onClick={() => changeGlobalMonth(-1)} title="Bulan Sebelumnya">
-            <ChevronLeft style={{ width: 14, height: 14 }} />
-          </button>
-          <span id="global-month-label">{getMonthLabel(selectedMonth)}</span>
-          <button onClick={() => changeGlobalMonth(1)} title="Bulan Berikutnya">
-            <ChevronRight style={{ width: 14, height: 14 }} />
-          </button>
-        </div>
+        {/* Right: Month selector, Alert bell, and Segmented toggle switch ('Katalog' / 'Alur') */}
+        <div className="flex flex-wrap items-center gap-3 self-start">
+          {/* Month Picker Pill */}
+          <div className="inline-flex items-center gap-1 bg-white border-2 border-[#11221B] rounded-full px-2 py-1 shadow-[3px_3px_0px_0px_#11221B]">
+            <button
+              type="button"
+              onClick={() => changeGlobalMonth(-1)}
+              className="w-7 h-7 rounded-full hover:bg-[#F8F7F2] flex items-center justify-center text-[#11221B] cursor-pointer"
+              title="Bulan Sebelumnya"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span id="global-month-label" className="font-mono text-xs font-bold px-2 text-[#11221B] whitespace-nowrap">
+              {getMonthLabel(selectedMonth)}
+            </span>
+            <button
+              type="button"
+              onClick={() => changeGlobalMonth(1)}
+              className="w-7 h-7 rounded-full hover:bg-[#F8F7F2] flex items-center justify-center text-[#11221B] cursor-pointer"
+              title="Bulan Berikutnya"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
 
-        <div className="header-badge-curr" title="Mata Uang">ID / RP</div>
-
-        <button className="header-icon-btn" onClick={() => go('budgets')} title="Peringatan Anggaran">
-          <Bell style={{ width: 16, height: 16 }} />
-          <span className="header-notif-badge" id="header-notif-count">{budgetAlertCount}</span>
-        </button>
-
-        {/* Account menu: visible at every width (the nav pills are hidden on mobile) */}
-        <div className="header-dropdown-wrap">
+          {/* Notification Bell */}
           <button
             type="button"
-            className="header-user-pill"
-            onClick={() => toggleMenu('user')}
-            title="Akun"
-            aria-haspopup="menu"
-            aria-expanded={openMenu === 'user'}
+            onClick={() => switchPage('budgets')}
+            title="Peringatan Anggaran"
+            className="relative w-10 h-10 rounded-full bg-white border-2 border-[#11221B] shadow-[3px_3px_0px_0px_#11221B] hover:-translate-y-0.5 transition-transform flex items-center justify-center cursor-pointer"
           >
-            <User style={{ width: 14, height: 14 }} />
-            <span className="header-user-name">{currentUser}</span>
-            <span aria-hidden="true">▾</span>
+            <Bell className="w-4 h-4 text-[#11221B]" />
+            {budgetAlertCount > 0 && (
+              <span
+                id="header-notif-count"
+                className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#CCF32F] border-2 border-[#11221B] font-mono text-[10px] font-bold flex items-center justify-center text-[#11221B]"
+              >
+                {budgetAlertCount}
+              </span>
+            )}
           </button>
-          <div className={`header-dropdown-menu${openMenu === 'user' ? ' show' : ''}`} role="menu">
-            <div className="dropdown-user-label">
-              <span>MASUK SEBAGAI</span>
-              <strong>{currentUser}</strong>
-            </div>
-            <div className="dropdown-divider"></div>
-            <button className="dropdown-item" role="menuitem" onClick={() => go('settings')}><Settings /> Pengaturan & Cadangan</button>
-            <button className="dropdown-item danger" role="menuitem" onClick={handleLogout} disabled={loggingOut}>
-              <LogOut /> {loggingOut ? 'Keluar...' : 'Keluar'}
+
+          {/* Segmented Toggle Switch: Katalog vs Alur */}
+          <div
+            role="group"
+            aria-label="Mode Tampilan"
+            className="inline-flex items-center p-1 rounded-full border-2 border-[#11221B] bg-white shadow-[3px_3px_0px_0px_#11221B]"
+          >
+            <button
+              type="button"
+              onClick={() => switchPage('dashboard')}
+              className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                !isAlurActive
+                  ? 'bg-[#11221B] text-white'
+                  : 'text-[#11221B] hover:bg-[#11221B]/5'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Katalog</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => switchPage('transactions')}
+              className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                isAlurActive
+                  ? 'bg-[#11221B] text-white'
+                  : 'text-[#11221B] hover:bg-[#11221B]/5'
+              }`}
+            >
+              <GitBranch className="w-3.5 h-3.5" />
+              <span>Alur</span>
             </button>
           </div>
         </div>
@@ -130,3 +149,4 @@ export default function Header({ searchInputRef }) {
     </header>
   );
 }
+

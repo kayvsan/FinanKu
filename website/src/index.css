@@ -1,52 +1,59 @@
-/* ─── DESIGN TOKENS ─── */
+@import "tailwindcss";
+
+/* ─── DESIGN TOKENS (SOFT NEO-BRUTALISM / PLAYFUL BENTO GRID) ─── */
         :root {
-            --navy: #1b1b3a;
-            --bg-page: #f3f5fc;
-            --bg-panel: #fff;
-            --border-heavy: 2px solid var(--navy);
-            --border-light: 1.5px solid var(--navy);
-            --shadow-hard: 4px 4px 0 var(--navy);
-            --radius-card: 6px;
-            --radius-btn: 6px;
+            --navy: #11221B;
+            --bg-page: #F8F7F2;
+            --bg-panel: #ffffff;
+            --border-heavy: 2px solid #11221B;
+            --border-light: 1.5px solid #11221B;
+            --shadow-hard: 4px 4px 0px 0px #11221B;
+            --radius-card: 16px;
+            --radius-btn: 12px;
 
             /* pastel badge palette */
-            --bubblegum: #ff8fcf;
-            --butter: #ffe45e;
-            --sky: #8ed1fc;
-            --lavender: #d6c7ff;
-            --mint: #bcead5;
-            --peach: #ffbe98;
+            --lime: #CCF32F;
+            --bubblegum: #FBCFE8;
+            --butter: #FEF08A;
+            --sky: #BAE6FD;
+            --lavender: #D8B4FE;
+            --mint: #BBF7D0;
+            --peach: #FED7AA;
 
             /* status */
-            --success: #0f7a5a;
-            --error: #ba1a1a;
+            --success: #0F7A5A;
+            --error: #BA1A1A;
 
             /* sidebar */
-            --sidebar-w: 260px;
-            --sidebar-w-collapsed: 56px;
+            --sidebar-w: 256px;
+            --sidebar-w-collapsed: 64px;
 
             /* fonts */
-            --font-display: 'Space Grotesk', sans-serif;
+            --font-display: 'Plus Jakarta Sans', 'Space Grotesk', sans-serif;
             --font-mono: 'Space Mono', monospace;
             --font-body: 'Plus Jakarta Sans', sans-serif;
+            --font-hand: 'Caveat', cursive;
         }
 
         /* ─── RESET ─── */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font-body);
-            background-color: #f3f5fc;
-            background-image: 
-                linear-gradient(to right, rgba(27, 27, 58, 0.06) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(27, 27, 58, 0.06) 1px, transparent 1px);
-            background-size: 24px 24px;
-            color: var(--navy);
+            background-color: #F8F7F2;
+            color: #11221B;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             line-height: 1.5;
+        }
+
+        .font-hand { font-family: var(--font-hand); }
+        .dot-pattern-purple {
+            background-color: #D8B4FE;
+            background-image: radial-gradient(#11221B 1.25px, transparent 1.25px);
+            background-size: 16px 16px;
         }
 
         h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 700; line-height: 1.2; }
@@ -1314,6 +1321,7 @@
 
         /* ─── INPUTS ─── */
         input[type="text"],
+        input[type="password"],
         input[type="date"],
         input[type="number"],
         select,
