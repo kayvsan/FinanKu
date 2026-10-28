@@ -59,7 +59,7 @@ export default function BudgetsScreen() {
 
   return (
     <Screen>
-      <WindowBox title="BATAS_ANGGARAN_BULANAN.CFG" icon={PieChart}>
+      <WindowBox title="BATAS ANGGARAN BULANAN" icon={PieChart}>
         <Txt variant="display" style={{ fontSize: 16 }}>Pantauan Batas Pengeluaran per Kategori</Txt>
         <Txt variant="mono" style={{ fontSize: 11, color: colors.muted, marginTop: 4 }}>
           Periode {getMonthLabel(selectedMonth)} · Aman (&lt;80%) · Hampir Habis (80-100%) · Terlampaui (&gt;100%)

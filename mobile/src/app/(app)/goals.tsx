@@ -16,7 +16,7 @@ export default function GoalsScreen() {
 
   return (
     <Screen back>
-      <WindowBox title="TARGET_TABUNGAN.OBJ" icon={Target} color="peach">
+      <WindowBox title="TARGET TABUNGAN" icon={Target} color="peach">
         <Txt variant="mono" style={{ fontSize: 11, color: colors.muted, marginBottom: 12 }}>
           Alokasikan dana ke target impian dan pantau estimasi tercapainya.
         </Txt>

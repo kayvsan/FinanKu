@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
 import { colors } from '@/lib/theme';
-import { LoadingWindow, TickerBar } from './ticker';
+import { LoadingWindow, NetworkProgress } from './ticker';
 
 export default function LoadingScreen({ message = 'Memuat data...', error, onRetry }: {
   message?: string;
@@ -10,7 +10,7 @@ export default function LoadingScreen({ message = 'Memuat data...', error, onRet
 }) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
-      <TickerBar />
+      <NetworkProgress />
       <LoadingWindow message={message} error={error} onRetry={onRetry} />
     </View>
   );

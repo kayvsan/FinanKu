@@ -41,7 +41,7 @@ export function Sheet({
           <Pressable style={StyleSheet.absoluteFill} onPress={dismissable ? onClose : undefined} accessibilityLabel="Tutup" />
           <View style={[s.sheet, { paddingBottom: Math.max(insets.bottom, 12) }]}>
             <View style={[s.sheetHeader, { backgroundColor: colors[color] }]}>
-              <Txt variant="monoBold" style={s.sheetTitle} numberOfLines={1}>{title}</Txt>
+              <Txt variant="monoBold" style={s.sheetTitle} numberOfLines={1}>{title.replace(/\.EXE|\.OBJ|\.SYS/g, '').replace(/_/g, ' ')}</Txt>
               {dismissable && (
                 <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Tutup" hitSlop={10} style={s.closeBtn}>
                   <X size={14} color={colors.navy} strokeWidth={2.6} />
@@ -111,28 +111,36 @@ export function FormError({ message }: { message: string }) {
   );
 }
 
-// ─── SEGMENTED TABS (Pengeluaran / Pemasukan / Transfer) ───
+// ─── SEGMENTED TABS (Pill style synced with web) ───
 export function Segmented<T extends string>({ options, value, onChange }: {
   options: { value: T; label: string }[];
   value: T;
   onChange: (v: T) => void;
 }) {
   return (
-    <View style={s.segmented}>
-      {options.map(o => {
-        const active = o.value === value;
-        return (
-          <Pressable
-            key={o.value}
-            onPress={() => onChange(o.value)}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
-            style={[s.segment, active && s.segmentActive]}
-          >
-            <Txt variant={active ? 'bodyBold' : 'bodySemi'} style={[s.segmentText, !active && { color: colors.muted }]}>{o.label}</Txt>
-          </Pressable>
-        );
-      })}
+    <View style={s.segmentedWrap}>
+      <View style={s.segmentedShadow} />
+      <View style={s.segmented}>
+        {options.map(o => {
+          const active = o.value === value;
+          return (
+            <Pressable
+              key={o.value}
+              onPress={() => onChange(o.value)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: active }}
+              style={[s.segment, active && s.segmentActive]}
+            >
+              <Txt
+                variant={active ? 'bodyBold' : 'bodySemi'}
+                style={[s.segmentText, { color: active ? '#fff' : colors.muted }]}
+              >
+                {o.label}
+              </Txt>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -276,7 +284,7 @@ export function DateField({ value, onChange, optional, placeholder = 'Pilih tang
 }
 
 const s = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(27,27,58,0.45)' },
+  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(17,34,27,0.45)' },
   sheet: {
     maxHeight: '88%',
     backgroundColor: colors.panel,
@@ -284,27 +292,27 @@ const s = StyleSheet.create({
     borderLeftWidth: 2,
     borderRightWidth: 2,
     borderColor: colors.navy,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     overflow: 'hidden',
   },
   sheetHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 2,
     borderBottomColor: colors.navy,
   },
-  sheetTitle: { fontSize: 12, letterSpacing: 0.5, flexShrink: 1 },
+  sheetTitle: { fontSize: 12, letterSpacing: 0.5, flexShrink: 1, textTransform: 'uppercase' },
   closeBtn: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: 4,
-    backgroundColor: colors.bubblegum,
+    borderRadius: 14,
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -316,35 +324,48 @@ const s = StyleSheet.create({
     color: colors.navy,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: radius.btn,
+    borderRadius: radius.input,
     backgroundColor: colors.panel,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'ios' ? 11 : 8,
     minHeight: 44,
   },
-  inputFocused: { borderWidth: 2, backgroundColor: '#fffdf0' },
+  inputFocused: { borderWidth: 2, backgroundColor: '#fff' },
   rupiahWrap: { position: 'relative', justifyContent: 'center' },
-  rpPrefix: { position: 'absolute', left: 12, zIndex: 1, fontSize: 13 },
+  rpPrefix: { position: 'absolute', left: 14, zIndex: 1, fontSize: 13 },
   error: {
     borderWidth: 1.5,
     borderColor: colors.error,
     backgroundColor: colors.errorBg,
-    borderRadius: radius.btn,
+    borderRadius: radius.input,
     padding: 10,
     marginBottom: 12,
+  },
+  segmentedWrap: {
+    position: 'relative',
+    marginBottom: 16,
+    marginRight: 3,
+  },
+  segmentedShadow: {
+    position: 'absolute',
+    top: 3,
+    left: 3,
+    right: -3,
+    bottom: -3,
+    borderRadius: 999,
+    backgroundColor: colors.navy,
   },
   segmented: {
     flexDirection: 'row',
     gap: 4,
-    padding: 3,
-    borderWidth: 1.5,
+    padding: 4,
+    borderWidth: 2,
     borderColor: colors.navy,
-    borderRadius: radius.btn,
+    borderRadius: 999,
     backgroundColor: colors.page,
-    marginBottom: 14,
   },
-  segment: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 4, borderWidth: 1.5, borderColor: 'transparent' },
-  segmentActive: { backgroundColor: colors.panel, borderColor: colors.navy },
+  segment: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 999 },
+  segmentActive: { backgroundColor: colors.navy },
   segmentText: { fontSize: 12 },
   selectBox: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   option: {
@@ -353,22 +374,22 @@ const s = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: 10,
     borderBottomWidth: 1,
     borderBottomColor: colors.hairline,
   },
   calHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  calNav: { width: 34, height: 34, borderWidth: 1.5, borderColor: colors.navy, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
+  calNav: { width: 34, height: 34, borderWidth: 1.5, borderColor: colors.navy, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   calGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   calCell: { width: `${100 / 7}%`, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 2 },
-  calDay: { width: '100%', height: '100%', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
-  calDayActive: { backgroundColor: colors.butter, borderWidth: 2, borderColor: colors.navy },
+  calDay: { width: '100%', height: '100%', borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  calDayActive: { backgroundColor: colors.lime, borderWidth: 2, borderColor: colors.navy },
   calQuick: {
     alignItems: 'center',
     paddingVertical: 10,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: 6,
+    borderRadius: 999,
     backgroundColor: colors.page,
   },
 });

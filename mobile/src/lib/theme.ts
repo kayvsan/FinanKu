@@ -1,28 +1,29 @@
-// Design tokens ported from website/src/index.css (:root)
+// Design tokens synced with website Soft Neo-Brutalism / Playful Bento Grid
 export const colors = {
-  navy: '#1b1b3a',
-  page: '#f3f5fc',
+  navy: '#11221B',
+  page: '#F8F7F2',
   panel: '#ffffff',
-  bubblegum: '#ff8fcf',
-  butter: '#ffe45e',
-  sky: '#8ed1fc',
-  lavender: '#d6c7ff',
-  mint: '#bcead5',
-  peach: '#ffbe98',
-  success: '#0f7a5a',
-  error: '#ba1a1a',
+  lime: '#CCF32F',
+  bubblegum: '#FBCFE8',
+  butter: '#FEF08A',
+  sky: '#BAE6FD',
+  lavender: '#D8B4FE',
+  mint: '#BBF7D0',
+  peach: '#FED7AA',
+  success: '#0F7A5A',
+  error: '#BA1A1A',
   errorBg: '#fef2f2',
-  muted: 'rgba(27,27,58,0.55)',
-  faint: 'rgba(27,27,58,0.4)',
-  hairline: 'rgba(27,27,58,0.12)',
-  grid: 'rgba(27,27,58,0.06)',
+  muted: 'rgba(17,34,27,0.62)',
+  faint: 'rgba(17,34,27,0.42)',
+  hairline: 'rgba(17,34,27,0.14)',
+  grid: 'rgba(17,34,27,0.06)',
 } as const;
 
-export type Pastel = 'butter' | 'sky' | 'mint' | 'bubblegum' | 'peach' | 'lavender';
+export type Pastel = 'lime' | 'butter' | 'sky' | 'mint' | 'bubblegum' | 'peach' | 'lavender';
 
 // Families registered by useFonts() in src/app/_layout.tsx
 export const fonts = {
-  display: 'SpaceGrotesk_700Bold',
+  display: 'PlusJakartaSans_700Bold',
   displayMedium: 'SpaceGrotesk_500Medium',
   mono: 'SpaceMono_400Regular',
   monoBold: 'SpaceMono_700Bold',
@@ -32,5 +33,6 @@ export const fonts = {
   bodyBold: 'PlusJakartaSans_700Bold',
 } as const;
 
-export const radius = { card: 6, btn: 6 } as const;
+export const radius = { card: 16, btn: 999, input: 12 } as const;
 export const border = { heavy: 2, light: 1.5 } as const;
+

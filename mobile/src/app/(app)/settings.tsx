@@ -74,7 +74,7 @@ export default function SettingsScreen() {
 
   return (
     <Screen back>
-      <WindowBox title="KONFIGURASI_SISTEM.INI" icon={Settings} color="mint">
+      <WindowBox title="PENGATURAN & CADANGAN" icon={Settings} color="mint">
         <Txt variant="mono" style={{ fontSize: 11, color: colors.muted }}>
           Seluruh data disimpan secara aman di server dan terhubung ke akun Anda. Cadangkan atau pulihkan data kapan saja.
         </Txt>

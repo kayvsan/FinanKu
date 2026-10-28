@@ -35,7 +35,7 @@ export default function CategoriesScreen() {
 
   return (
     <Screen back>
-      <WindowBox title="KLASIFIKASI_KATEGORI.SYS" icon={Tags} color="lavender">
+      <WindowBox title="KLASIFIKASI KATEGORI" icon={Tags} color="lavender">
         <RetroButton label="TAMBAH KATEGORI" icon={Plus} variant="butter" small onPress={() => openCategoryModal()} style={{ alignSelf: 'flex-start', marginBottom: 14 }} />
         {section('expense', 'Kategori Pengeluaran', ArrowUpRight, colors.error)}
         {section('income', 'Kategori Pemasukan', ArrowDownLeft, colors.success)}

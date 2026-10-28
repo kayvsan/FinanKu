@@ -29,7 +29,7 @@ export default function MoreScreen() {
 
   return (
     <Screen>
-      <WindowBox title="MENU_LAINNYA.EXE" icon={Settings} bodyStyle={{ gap: 12 }}>
+      <WindowBox title="MENU & PUSTAKA KAS" icon={Settings} bodyStyle={{ gap: 12 }}>
         {MENU.map(item => {
           const Icon = item.icon;
           return (
@@ -51,9 +51,21 @@ export default function MoreScreen() {
         })}
       </WindowBox>
 
-      <WindowBox title="AKUN_PENGGUNA.SYS" icon={User} color="lavender">
-        <Txt variant="monoBold" style={{ fontSize: 10, color: colors.muted }}>MASUK SEBAGAI</Txt>
-        <Txt variant="display" style={{ fontSize: 20, marginBottom: 12 }}>{user?.username}</Txt>
+      <WindowBox title="PROFIL PENGGUNA" icon={User} color="lavender">
+        <View style={st.profileRow}>
+          <View style={st.avatarCircle}>
+            <Txt variant="monoBold" style={{ fontSize: 16, color: '#fff' }}>
+              {(user?.username || 'F').charAt(0).toUpperCase()}
+            </Txt>
+            <View style={st.avatarDot} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Txt variant="display" style={{ fontSize: 18 }}>{user?.username || 'Pengguna'}</Txt>
+            <View style={st.adminBadge}>
+              <Txt variant="monoBold" style={{ fontSize: 9 }}>Admin</Txt>
+            </View>
+          </View>
+        </View>
         <RetroButton label={loggingOut ? 'Keluar...' : 'Keluar'} icon={LogOut} variant="danger" onPress={handleLogout} loading={loggingOut} />
       </WindowBox>
     </Screen>
@@ -65,10 +77,47 @@ const st = StyleSheet.create({
   itemIcon: {
     width: 38,
     height: 38,
-    borderRadius: 6,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: colors.navy,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 14,
+  },
+  avatarCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: colors.navy,
+    backgroundColor: colors.navy,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarDot: {
+    position: 'absolute',
+    top: -1,
+    right: -1,
+    width: 12,
+    height: 12,
+    borderRadius: 999,
+    backgroundColor: colors.lime,
+    borderWidth: 1.5,
+    borderColor: colors.navy,
+  },
+  adminBadge: {
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    borderRadius: 999,
+    borderWidth: 1.5,
+    borderColor: colors.navy,
+    backgroundColor: colors.lime,
   },
 });

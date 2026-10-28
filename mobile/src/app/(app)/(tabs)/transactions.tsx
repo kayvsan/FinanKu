@@ -45,7 +45,7 @@ export default function TransactionsScreen() {
 
   return (
     <Screen>
-      <WindowBox title="FILTER_DAN_PENCARIAN.EXE" icon={Filter}>
+      <WindowBox title="FILTER & PENCARIAN" icon={Filter}>
         <View style={{ justifyContent: 'center', marginBottom: 10 }}>
           <View style={st.searchIcon}><Search size={16} color={colors.muted} /></View>
           <TextField value={search} onChangeText={set('search')} placeholder="Cari catatan atau #tag..." autoCapitalize="none" style={{ paddingLeft: 36 }} />
@@ -73,7 +73,7 @@ export default function TransactionsScreen() {
               <SelectField
                 value={category}
                 onChange={set('category')}
-                title="FILTER_KATEGORI.EXE"
+                title="FILTER KATEGORI"
                 options={[{ value: 'all', label: 'Semua Kategori' }, ...state.categories.map(c => ({ value: c.id, label: c.name }))]}
               />
             </Field>
@@ -81,7 +81,7 @@ export default function TransactionsScreen() {
               <SelectField
                 value={wallet}
                 onChange={set('wallet')}
-                title="FILTER_DOMPET.EXE"
+                title="FILTER DOMPET"
                 options={[{ value: 'all', label: 'Semua Dompet' }, ...state.wallets.map(w => ({ value: w.id, label: w.name }))]}
               />
             </Field>
@@ -100,7 +100,7 @@ export default function TransactionsScreen() {
         </View>
       </WindowBox>
 
-      <WindowBox title="RIWAYAT_TRANSAKSI.LOG" icon={List} color="sky" bodyStyle={{ paddingTop: 2 }}>
+      <WindowBox title="RIWAYAT TRANSAKSI" icon={List} color="sky" bodyStyle={{ paddingTop: 2 }}>
         {slice.length ? slice.map(tx => <TxItem key={tx.id} tx={tx} />) : (
           <EmptyState text="Tidak ada transaksi yang cocok dengan filter. Coba ubah kata kunci atau rentang tanggal." />
         )}
@@ -118,12 +118,12 @@ const st = StyleSheet.create({
   typeChip: {
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: colors.navy,
     borderRadius: 999,
     backgroundColor: colors.panel,
   },
-  typeChipActive: { backgroundColor: colors.butter, borderWidth: 2 },
+  typeChipActive: { backgroundColor: colors.lime, borderWidth: 2 },
   moreToggle: { marginTop: 10, alignSelf: 'flex-start', paddingVertical: 4 },
   countRow: {
     flexDirection: 'row',

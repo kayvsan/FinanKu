@@ -112,7 +112,7 @@ export function KpiCard({ strip, label, badge, icon: Icon, pill, value, valueCol
 }
 
 // ─── CHARTS ───
-export const CHART_PALETTE = ['#1b1b3a', '#ff8fcf', '#ffe45e', '#8ed1fc', '#d6c7ff', '#bcead5', '#ffbe98', '#0f7a5a'];
+export const CHART_PALETTE = ['#11221B', '#CCF32F', '#D8B4FE', '#BAE6FD', '#BBF7D0', '#FED7AA', '#FEF08A', '#FBCFE8'];
 
 export function DonutChart({ values, size = 190 }: { values: number[]; size?: number }) {
   const total = values.reduce((a, b) => a + b, 0) || 1;
@@ -237,13 +237,13 @@ export const s = StyleSheet.create({
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5, gap: 8 },
   small: { fontSize: 10, color: colors.muted },
   track: {
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: colors.navy,
-    borderRadius: 4,
+    borderRadius: 999,
     backgroundColor: colors.page,
     overflow: 'hidden',
   },
-  fill: { height: '100%', borderRightWidth: 1.5, borderRightColor: colors.navy },
+  fill: { height: '100%', borderRightWidth: 2, borderRightColor: colors.navy },
   kpiStrip: {
     flexDirection: 'row',
     alignItems: 'center',

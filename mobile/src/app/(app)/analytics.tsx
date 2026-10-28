@@ -37,7 +37,7 @@ export default function AnalyticsScreen() {
 
   return (
     <Screen back>
-      <WindowBox title="DISTRIBUSI_PENGELUARAN.DAT" icon={PieChart}>
+      <WindowBox title="DISTRIBUSI PENGELUARAN" icon={PieChart}>
         {entries.length === 0 ? (
           <EmptyState text="Belum ada pengeluaran pada bulan ini." />
         ) : (
@@ -60,11 +60,11 @@ export default function AnalyticsScreen() {
         )}
       </WindowBox>
 
-      <WindowBox title="TREN_ARUS_KAS.GRAPH" icon={TrendingUp} color="sky" showControls={false}
+      <WindowBox title="TREN ARUS KAS" icon={TrendingUp} color="sky" showControls={false}
         actions={
           <View style={{ flexDirection: 'row', gap: 4 }}>
             {RANGES.map(r => (
-              <Pressable key={r} onPress={() => setRange(r)} style={[st.range, range === r && { backgroundColor: colors.butter }]} accessibilityRole="button">
+              <Pressable key={r} onPress={() => setRange(r)} style={[st.range, range === r && { backgroundColor: colors.lime }]} accessibilityRole="button">
                 <Txt variant="monoBold" style={{ fontSize: 10 }}>{r}B</Txt>
               </Pressable>
             ))}

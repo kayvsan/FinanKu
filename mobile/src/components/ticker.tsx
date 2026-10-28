@@ -80,7 +80,7 @@ export function LoadingWindow({ message, error, onRetry }: { message: string; er
         <View style={st.loadingHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <Loader size={14} color={colors.navy} />
-            <Txt variant="monoBold" style={{ fontSize: 11 }}>MEMUAT_SISTEM.EXE</Txt>
+            <Txt variant="monoBold" style={{ fontSize: 11 }}>MEMUAT SISTEM</Txt>
           </View>
           <WinButtons />
         </View>
@@ -93,7 +93,7 @@ export function LoadingWindow({ message, error, onRetry }: { message: string; er
               {onRetry && <RetroButton label="COBA LAGI" onPress={onRetry} />}
             </>
           ) : (
-            <Txt variant="monoBold" style={{ textAlign: 'center', fontSize: 12, color: colors.muted }}>✦ {message}</Txt>
+            <Txt variant="monoBold" style={{ textAlign: 'center', fontSize: 12, color: colors.muted }}>{message}</Txt>
           )}
         </View>
       </HardShadow>

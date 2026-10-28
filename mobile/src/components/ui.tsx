@@ -1,4 +1,4 @@
-// Retro building blocks shared by every screen (ported look of the web app's window-box / btn / chip)
+// Soft Neo-Brutalism / Playful Bento building blocks shared by every screen
 import type { ComponentType, ReactNode } from 'react';
 import {
   ActivityIndicator,
@@ -24,7 +24,7 @@ export function Txt({ variant = 'body', style, ...props }: TextProps & { variant
 }
 
 // ─── HARD SHADOW ───
-// React Native shadows are blurred; the retro look needs a solid navy block offset behind the box.
+// React Native shadows are blurred; Neo-Brutalism needs a solid #11221B block offset behind the box.
 export function HardShadow({
   children,
   offset = 4,
@@ -46,14 +46,12 @@ export function HardShadow({
   );
 }
 
-// ─── WINDOW BOX (SOMETHING.EXE) ───
+// ─── WINDOW BOX ───
 export function WinButtons() {
   return (
     <View style={styles.winControls}>
-      {['_', '□', '✕'].map((c, i) => (
-        <View key={c} style={[styles.winBtn, i === 2 && { backgroundColor: colors.bubblegum }]}>
-          <Txt variant="monoBold" style={styles.winBtnText}>{c}</Txt>
-        </View>
+      {[colors.butter, colors.mint, colors.bubblegum].map((bg, i) => (
+        <View key={i} style={[styles.winDot, { backgroundColor: bg }]} />
       ))}
     </View>
   );
@@ -62,27 +60,32 @@ export function WinButtons() {
 export function WindowBox({
   title,
   icon: Icon,
-  color = 'butter',
+  color = 'lime',
   actions,
   children,
   style,
   bodyStyle,
-  showControls = true,
+  showControls = false,
 }: {
   title: string;
   icon?: IconType;
-  color?: Pastel;
+  color?: Pastel | 'page';
   actions?: ReactNode;
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   bodyStyle?: StyleProp<ViewStyle>;
   showControls?: boolean;
 }) {
+  const headerBg = color === 'page' ? colors.page : colors[color];
   return (
     <HardShadow style={[{ marginBottom: 18 }, style]} contentStyle={{ overflow: 'hidden' }}>
-      <View style={[styles.winHeader, { backgroundColor: colors[color] }]}>
+      <View style={[styles.winHeader, { backgroundColor: headerBg }]}>
         <View style={styles.winTitle}>
-          {Icon && <Icon size={14} color={colors.navy} strokeWidth={2.2} />}
+          {Icon && (
+            <View style={styles.winIconBox}>
+              <Icon size={14} color={colors.navy} strokeWidth={2.3} />
+            </View>
+          )}
           <Txt variant="monoBold" style={styles.winTitleText} numberOfLines={1}>{title}</Txt>
         </View>
         <View style={styles.winControls}>
@@ -96,12 +99,13 @@ export function WindowBox({
 }
 
 // ─── BUTTONS ───
-type ButtonVariant = 'primary' | 'secondary' | 'butter' | 'danger' | 'warn' | 'success';
+type ButtonVariant = 'primary' | 'secondary' | 'butter' | 'lime' | 'danger' | 'warn' | 'success';
 
 const BUTTON_COLORS: Record<ButtonVariant, { bg: string; fg: string }> = {
-  primary: { bg: colors.navy, fg: '#fff' },
+  primary: { bg: colors.lime, fg: colors.navy },
   secondary: { bg: '#fff', fg: colors.navy },
-  butter: { bg: colors.butter, fg: colors.navy },
+  butter: { bg: colors.lime, fg: colors.navy },
+  lime: { bg: colors.lime, fg: colors.navy },
   danger: { bg: colors.error, fg: '#fff' },
   warn: { bg: colors.butter, fg: colors.navy },
   success: { bg: colors.success, fg: '#fff' },
@@ -148,7 +152,7 @@ export function RetroButton({
           pressed && !inactive && { transform: [{ translateX: offset }, { translateY: offset }] },
         ]}
       >
-        {loading ? <ActivityIndicator size="small" color={fg} /> : Icon ? <Icon size={small ? 14 : 16} color={fg} strokeWidth={2.2} /> : null}
+        {loading ? <ActivityIndicator size="small" color={fg} /> : Icon ? <Icon size={small ? 14 : 16} color={fg} strokeWidth={2.4} /> : null}
         <Txt variant="display" style={[styles.btnText, small && { fontSize: 12 }, { color: fg }, textStyle]}>{label}</Txt>
       </Pressable>
     </View>
@@ -168,7 +172,7 @@ export function BadgeButton({ label, onPress, icon: Icon, color = '#fff', disabl
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.badgeBtn, { backgroundColor: pressed ? colors.butter : color, opacity: disabled ? 0.6 : 1 }]}
+      style={({ pressed }) => [styles.badgeBtn, { backgroundColor: pressed ? colors.lime : color, opacity: disabled ? 0.6 : 1 }]}
     >
       {Icon && <Icon size={12} color={colors.navy} strokeWidth={2.4} />}
       <Txt variant="monoBold" style={styles.badgeBtnText}>{label}</Txt>
@@ -193,7 +197,7 @@ export function IconButton({ icon: Icon, onPress, label, danger, disabled }: {
       hitSlop={6}
       style={({ pressed }) => [
         styles.iconBtn,
-        { backgroundColor: pressed ? (danger ? colors.bubblegum : colors.butter) : '#fff', opacity: disabled ? 0.5 : 1 },
+        { backgroundColor: pressed ? (danger ? colors.bubblegum : colors.lime) : '#fff', opacity: disabled ? 0.5 : 1 },
       ]}
     >
       <Icon size={15} color={danger ? colors.error : colors.navy} strokeWidth={2.2} />
@@ -238,56 +242,62 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderBottomWidth: 2,
     borderBottomColor: colors.navy,
     gap: 8,
   },
-  winTitle: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 },
-  winTitleText: { fontSize: 11, letterSpacing: 0.4, textTransform: 'uppercase', flexShrink: 1 },
-  winControls: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  winBtn: {
-    width: 18,
-    height: 18,
+  winTitle: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+  winIconBox: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: 3,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  winBtnText: { fontSize: 9, lineHeight: 11 },
+  winTitleText: { fontSize: 11, letterSpacing: 0.4, textTransform: 'uppercase', flexShrink: 1 },
+  winControls: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  winDot: {
+    width: 11,
+    height: 11,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: colors.navy,
+  },
   winBody: { padding: 14 },
   btn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     borderWidth: 2,
     borderColor: colors.navy,
     borderRadius: radius.btn,
   },
-  btnSmall: { paddingVertical: 6, paddingHorizontal: 10 },
-  btnText: { fontSize: 13, letterSpacing: 0.2 },
+  btnSmall: { paddingVertical: 7, paddingHorizontal: 12 },
+  btnText: { fontSize: 13, letterSpacing: 0.1 },
   badgeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: 4,
+    borderRadius: 999,
     marginRight: 2,
   },
   badgeBtnText: { fontSize: 10 },
   iconBtn: {
     width: 30,
     height: 30,
-    borderRadius: 5,
+    borderRadius: 8,
     borderWidth: 1.5,
     borderColor: colors.navy,
     alignItems: 'center',
@@ -295,21 +305,21 @@ export const styles = StyleSheet.create({
   },
   chip: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: 4,
+    borderRadius: 999,
   },
   chipText: { fontSize: 10 },
   tagPill: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderWidth: 1.5,
     borderColor: colors.navy,
-    borderRadius: 4,
-    backgroundColor: '#fff',
+    borderRadius: 999,
+    backgroundColor: colors.page,
   },
   tagPillText: { fontSize: 10 },
   empty: {
@@ -322,3 +332,4 @@ export const styles = StyleSheet.create({
   },
   emptyText: { color: colors.muted, fontSize: 13, textAlign: 'center' },
 });
+

@@ -15,7 +15,7 @@ export default function WalletsScreen() {
 
   return (
     <Screen back>
-      <WindowBox title="MANAJEMEN_DOMPET.DAT" icon={Wallet}>
+      <WindowBox title="MANAJEMEN DOMPET" icon={Wallet}>
         <Txt variant="mono" style={{ fontSize: 11, color: colors.muted, marginBottom: 12 }}>
           Saldo dihitung otomatis dari saldo awal, seluruh pemasukan, pengeluaran, dan mutasi transfer antar rekening.
         </Txt>
